@@ -69,7 +69,7 @@ namespace Analects.Loader
                     }
                 }
 
-                // We must explicitly load the DLL here because the temporary directory 
+                // We must explicitly load the DLL here because the temporary directory
                 // is not in the PATH.
                 // Once it is loaded, the DllImport directives that use the DLL will use
                 // the one that is already loaded into the process.
@@ -135,8 +135,9 @@ namespace Analects.Loader
                 if (executingAssembly.GetManifestResourceNames().Contains(String.Format("{0}.{2}.{1}.pdb", assemblyName.Name, shortName, LibsFolder)))
                 {
                     using (var ds = executingAssembly.GetManifestResourceStream(String.Format("{0}.{2}.{1}.pdb", assemblyName.Name, shortName, LibsFolder)))
+                    using (var ddecom = new DeflateStream(ds, CompressionMode.Decompress))
                     {
-                        debugData = new BinaryReader(ds).ReadBytes((int)ds.Length);
+                        debugData = ReadFully(ddecom);
                     }
                 }
 

@@ -24,27 +24,28 @@ function Install-Targets ( $project, $importFile )
 function Copy-MSBuildTasks ( $project ) 
 {
     $solutionDir = Get-SolutionDir
-    $tasksToolsPath = (Join-Path $solutionDir "Build")
-    $targetPath = (Join-Path $toolsPath "EmbedAssemblies.targets")
+    $dstToolsPath = (Join-Path $solutionDir "Tools")
+    $dstTargetPath = (Join-Path $dstToolsPath "EmbedAssemblies.targets")
+    $srcTargetPath = (Join-Path $toolsPath "EmbedAssemblies.targets")
 
-    if(!(Test-Path $tasksToolsPath)) {
-        mkdir $tasksToolsPath | Out-Null
+    if(!(Test-Path $dstToolsPath)) {
+        mkdir $dstToolsPath | Out-Null
     }
 
-    if(!(Test-Path (Join-Path $tasksToolsPath "EmbedAssemblies.targets"))) {
-        Write-Host "Copying Targets files to $tasksToolsPath"
-        Copy-Item $targetPath $tasksToolsPath -Force | Out-Null
+    if(!(Test-Path $dstTargetPath)) {
+        Write-Host "Copying Targets files to $dstToolsPath"
+        Copy-Item $srcTargetPath $dstToolsPath -Force | Out-Null
     }
 
-    Write-Host "Don't forget to commit the Build folder"
-    return '$(SolutionDir)\Build'
+    Write-Host "Don't forget to commit the Tools folder"
+    return $dstTargetPath
 }
 
 function Main
 {
-    $taskPath = Copy-MSBuildTasks $project
+    $targetPath = Copy-MSBuildTasks $project
     
-    Install-Targets $project '$(SolutionDir)\Build\EmbedAssemblies.targets'
+    Install-Targets $project $targetPath
 }
 
 Main
